@@ -1,0 +1,40 @@
+<!-- Example Template for Streaming Grid Component -->
+
+<div class="streaming-grid-container">
+  <!-- Connection Status Indicator -->
+  <div class="status-bar">
+    <div class="connection-status">
+      <span [class.connected]="isConnected$ | async" 
+            [class.disconnected]="!(isConnected$ | async)">
+        {{ (isConnected$ | async) ? '● Connected' : '○ Disconnected' }}
+      </span>
+    </div>
+    
+    <div class="grid-actions">
+      <button (click)="refreshGrid()" class="btn btn-secondary">
+        Refresh
+      </button>
+      <button (click)="exportSelected()" class="btn btn-secondary">
+        Export Selected
+      </button>
+      <button (click)="clearFilters()" class="btn btn-secondary">
+        Clear Filters
+      </button>
+    </div>
+  </div>
+  
+  <!-- ag-Grid -->
+  <ag-grid-angular
+    class="ag-theme-alpine"
+    style="height: 600px; width: 100%;"
+    [rowData]="rowData$ | async"
+    [columnDefs]="columnDefs"
+    [gridOptions]="gridOptions"
+    (gridReady)="onGridReady($event)"
+    (selectionChanged)="onSelectionChanged($event)"
+    rowSelection="multiple"
+    animateRows="true">
+  </ag-grid-angular>
+</div>
+
+

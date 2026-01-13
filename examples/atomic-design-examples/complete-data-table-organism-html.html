@@ -1,0 +1,103 @@
+<!--
+  ============================================================================
+  DATA TABLE ORGANISM TEMPLATE
+  ============================================================================
+  
+  This template combines:
+  - SearchFormMoleculeComponent (for searching)
+  - FilterGroupMoleculeComponent (for filtering)
+  - ag-Grid (for displaying data)
+  - ButtonAtomComponent (for actions)
+  
+  The organism handles:
+  - Search functionality
+  - Filtering
+  - Row selection
+  - Row clicking
+  - Export functionality
+  - Loading states
+-->
+
+<div class="data-table-organism">
+  
+  <!-- 
+    Controls Section: Search and Filters
+    Only shown if enabled in config
+  -->
+  <div class="table-controls" *ngIf="config.enableSearch || config.enableFilters">
+    
+    <!-- 
+      Search Form Molecule: Combines Input + Button atoms
+      Only shown if search is enabled
+    -->
+    <app-search-form-molecule
+      *ngIf="config.enableSearch"
+      [formControl]="searchForm.get('query')"
+      placeholder="Search table..."
+      (search)="searchChanged.emit($event)"
+      (clear)="onClearSearch()"
+      class="table-search">
+    </app-search-form-molecule>
+    
+    <!-- 
+      Filter Group Molecule: Combines Label + Select atoms
+      Only shown if filters are enabled
+    -->
+    <app-filter-group-molecule
+      *ngIf="config.enableFilters"
+      [formControl]="filterForm.get('filter')"
+      label="Filter by:"
+      (filterChange)="filterChanged.emit($event)"
+      class="table-filter">
+    </app-filter-group-molecule>
+    
+    <!-- Action Buttons -->
+    <div class="table-actions">
+      <app-button
+        type="secondary"
+        size="small"
+        (clicked)="refreshGrid()">
+        Refresh
+      </app-button>
+      <app-button
+        type="secondary"
+        size="small"
+        (clicked)="onExport()">
+        Export
+      </app-button>
+    </div>
+  </div>
+  
+  <!-- 
+    Grid Section: ag-Grid wrapped component
+    Shows loading overlay when loading
+  -->
+  <div class="table-grid" [class.loading]="loading">
+    
+    <!-- 
+      ag-Grid: Third-party grid component
+      Only shown when not loading
+      Uses gridOptions computed property for configuration
+    -->
+    <ag-grid-angular
+      *ngIf="!loading"
+      class="ag-theme-alpine"
+      [rowData]="data"
+      [columnDefs]="config.columns"
+      [gridOptions]="gridOptions"
+      (gridReady)="onGridReady($event)"
+      style="height: 500px; width: 100%;">
+    </ag-grid-angular>
+    
+    <!-- 
+      Loading Overlay: Shown when data is loading
+      Provides visual feedback to user
+    -->
+    <div *ngIf="loading" class="loading-overlay">
+      <div class="spinner"></div>
+      <span>Loading data...</span>
+    </div>
+  </div>
+</div>
+
+

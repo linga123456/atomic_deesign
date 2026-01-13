@@ -1,0 +1,158 @@
+/**
+ * ============================================================================
+ * BUTTON ATOM STYLES
+ * ============================================================================
+ * 
+ * Styles for the Button Atom component.
+ * Uses BEM-like naming convention with btn- prefix.
+ */
+
+.btn {
+  // Base button styles - applied to all buttons
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  font-family: inherit;
+  text-align: center;
+  text-decoration: none;
+  
+  // Focus styles for accessibility
+  &:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+  }
+  
+  // ==========================================================================
+  // BUTTON TYPES (Colors/Styles)
+  // ==========================================================================
+  
+  &.btn-primary {
+    background-color: #007bff;
+    color: white;
+    
+    &:hover:not(.btn-disabled):not(.btn-loading) {
+      background-color: #0056b3;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
+    }
+    
+    &:active:not(.btn-disabled) {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+  }
+  
+  &.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+    
+    &:hover:not(.btn-disabled):not(.btn-loading) {
+      background-color: #545b62;
+    }
+  }
+  
+  &.btn-danger {
+    background-color: #dc3545;
+    color: white;
+    
+    &:hover:not(.btn-disabled):not(.btn-loading) {
+      background-color: #c82333;
+    }
+  }
+  
+  &.btn-success {
+    background-color: #28a745;
+    color: white;
+    
+    &:hover:not(.btn-disabled):not(.btn-loading) {
+      background-color: #218838;
+    }
+  }
+  
+  &.btn-warning {
+    background-color: #ffc107;
+    color: #212529;
+    
+    &:hover:not(.btn-disabled):not(.btn-loading) {
+      background-color: #e0a800;
+    }
+  }
+  
+  // ==========================================================================
+  // BUTTON SIZES
+  // ==========================================================================
+  
+  &.btn-small {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    min-height: 32px;
+  }
+  
+  &.btn-medium {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    min-height: 40px;
+  }
+  
+  &.btn-large {
+    padding: 0.75rem 1.5rem;
+    font-size: 1.125rem;
+    min-height: 48px;
+  }
+  
+  // ==========================================================================
+  // BUTTON STATES
+  // ==========================================================================
+  
+  &.btn-disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+  
+  &.btn-loading {
+    cursor: wait;
+    pointer-events: none;
+  }
+  
+  &.btn-full-width {
+    width: 100%;
+  }
+  
+  // ==========================================================================
+  // ICON STYLES
+  // ==========================================================================
+  
+  .btn-icon {
+    font-size: 1em;
+  }
+  
+  // ==========================================================================
+  // SPINNER STYLES
+  // ==========================================================================
+  
+  .spinner {
+    display: inline-block;
+    
+    i {
+      animation: spin 1s linear infinite;
+    }
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+

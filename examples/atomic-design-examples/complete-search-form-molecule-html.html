@@ -1,0 +1,58 @@
+<!--
+  ============================================================================
+  SEARCH FORM MOLECULE TEMPLATE
+  ============================================================================
+  
+  This template combines:
+  - InputAtomComponent (for the search input)
+  - ButtonAtomComponent (for search and clear actions)
+  
+  The form handles:
+  - Search submission (Enter key or button click)
+  - Clear functionality
+  - Real-time value changes (via valueChange output)
+-->
+
+<form 
+  [formGroup]="searchForm" 
+  (ngSubmit)="onSubmit()" 
+  class="search-form">
+  
+  <!-- 
+    Input Atom: The search input field
+    Uses formControlName to bind to reactive form
+  -->
+  <app-input
+    formControlName="query"
+    [placeholder]="placeholder"
+    class="search-input">
+  </app-input>
+  
+  <!-- Action Buttons Container -->
+  <div class="search-actions">
+    
+    <!-- 
+      Search Button Atom: Primary action
+      Triggers search on click or form submit
+    -->
+    <app-button
+      type="primary"
+      (clicked)="onSubmit()">
+      {{ buttonText }}
+    </app-button>
+    
+    <!-- 
+      Clear Button Atom: Secondary action
+      Only shown when there's a value and showClearButton is true
+    -->
+    <app-button
+      *ngIf="hasValue && showClearButton"
+      type="secondary"
+      size="small"
+      (clicked)="onClear()">
+      Clear
+    </app-button>
+  </div>
+</form>
+
+

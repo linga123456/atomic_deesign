@@ -1,0 +1,35 @@
+<!--
+  ============================================================================
+  BUTTON ATOM TEMPLATE
+  ============================================================================
+  
+  This template renders a button with:
+  - Dynamic CSS classes based on props
+  - Loading spinner when loading
+  - Icon support
+  - Content projection for button text
+  - Proper accessibility attributes
+-->
+
+<button
+  [class]="buttonClasses"
+  [disabled]="disabled || loading"
+  [attr.aria-label]="ariaLabel"
+  [attr.aria-busy]="loading"
+  (click)="onClick()"
+  type="button"
+  class="btn">
+  
+  <!-- Loading Spinner: Shows when button is in loading state -->
+  <span *ngIf="loading" class="spinner" aria-hidden="true">
+    <i class="fa fa-spinner fa-spin"></i>
+  </span>
+  
+  <!-- Icon: Shows when icon is provided and not loading -->
+  <i *ngIf="icon && !loading" [class]="icon" class="btn-icon" aria-hidden="true"></i>
+  
+  <!-- Button Content: Projected content (button text) -->
+  <ng-content></ng-content>
+</button>
+
+
