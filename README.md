@@ -85,7 +85,21 @@ This repository contains comprehensive guidelines and examples for developing An
 - CI/CD setup
 - Best practices
 
-### 10. [examples/](./examples/)
+### 10. [PRE_COMMIT_HOOKS_SETUP.md](./PRE_COMMIT_HOOKS_SETUP.md)
+**Complete guide for mandatory lint fixes and unit tests**:
+- Husky + lint-staged setup
+- Pre-commit hook configuration
+- Unit test requirements for TypeScript files
+- ESLint and Prettier configuration
+- Troubleshooting and best practices
+
+### 11. [PRE_COMMIT_SETUP_QUICK_START.md](./PRE_COMMIT_SETUP_QUICK_START.md)
+**Quick 5-minute setup guide**:
+- Essential commands
+- Minimal configuration
+- Quick testing steps
+
+### 12. [examples/](./examples/)
 **Working code examples**:
 - `streaming-service.example.ts` - r-Socket abstraction service
 - `grid-adapter-service.example.ts` - ag-Grid abstraction service
@@ -130,6 +144,12 @@ This repository contains comprehensive guidelines and examples for developing An
 2. **Complete Guide**: Read `MODULE_FEDERATION_SETUP_GUIDE.md` for detailed instructions
 3. **Node Version Management**: Follow `NODE_VERSION_MANAGEMENT_GUIDE.md` for managing Node 12 vs Node 18+
 4. **Important**: Your Angular 11 app requires Node.js 12 - use NVM to switch versions
+
+### For Pre-Commit Hooks (Mandatory Lint & Tests):
+1. **Quick Start**: Start with `PRE_COMMIT_SETUP_QUICK_START.md` for 5-minute setup
+2. **Complete Guide**: Read `PRE_COMMIT_HOOKS_SETUP.md` for detailed instructions
+3. **What it does**: Automatically runs lint fixes and unit tests before every commit
+4. **Requirements**: Ensures all TypeScript files have unit tests and pass linting
 
 ## 📋 Current Stack
 

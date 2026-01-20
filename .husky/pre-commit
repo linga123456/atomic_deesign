@@ -1,0 +1,21 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🔍 Running lint fixes on staged files..."
+npx lint-staged
+
+if [ $? -ne 0 ]; then
+  echo "❌ Lint fixes failed! Please fix errors before committing."
+  exit 1
+fi
+
+echo "🧪 Checking for unit tests and running tests..."
+node scripts/test-changed-files.js
+
+if [ $? -ne 0 ]; then
+  echo "❌ Unit test checks failed! Please fix errors before committing."
+  exit 1
+fi
+
+echo "✅ All checks passed! Proceeding with commit..."
+
