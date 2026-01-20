@@ -1,14 +1,96 @@
 # Tie-Breaker Dialog - Atomic Design
-## Simple Implementation Guide
+## Implementation Guide for Development Team
 
-This document provides the Atomic Design breakdown for the **Tie-Breaker Ordering Dialog** feature only.
+**Document Version**: 1.0  
+**Target Audience**: Development Lead & Team  
+**Feature**: Tie-Breaker Ordering Dialog  
+**Priority**: High  
+**Estimated Effort**: 3-5 days
 
-**Feature Requirements:**
-- Button to open tie-breaker dialog
-- Dialog showing all lenders with tie-breaker numbers (1, 2, 3...)
-- Drag-and-drop to reorder lenders
-- Save button to persist tie-breaker order
-- Cancel button to close without saving
+---
+
+## Executive Summary
+
+### What We're Building
+A dialog component that allows administrators to set tie-breaker ordering for lenders. When multiple lenders offer the same final fee for unsolicited bids, the system uses this order to determine priority.
+
+### Key Components
+- **1 Organism**: TieBreakerDialogOrganism (complete dialog with ag-Grid)
+- **6-7 Atoms**: Button (or TieBreakerButton), DragHandle, Label, NumberDisplay, IconButton, InstructionText
+- **2 Molecules**: DialogHeader, DialogActions
+- **1 Cell Renderer**: DragHandleCellRenderer (for ag-Grid)
+
+**Note**: TieBreakerButton can be either:
+- Just ButtonAtom used directly (recommended)
+- Or TieBreakerButtonAtom if needed for reusability
+
+### Technical Stack
+- **Angular**: 11.x
+- **ag-Grid**: 24.x (with row dragging)
+- **Pattern**: Atomic Design + Migration-Friendly
+
+### Business Value
+- Enables priority-based lender selection when fees match
+- Improves bid allocation fairness
+- Provides administrative control over lender preferences
+
+---
+
+## Quick Reference for Dev Lead
+
+### Component Count
+- **Atoms**: 6 components
+- **Molecules**: 3 components  
+- **Cell Renderers**: 1 component
+- **Organisms**: 1 component
+- **Total**: 11 components
+
+### File Structure
+```
+features/lender-management/
+├── molecules/
+│   └── tie-breaker-button/
+├── organisms/
+│   └── tie-breaker-dialog/
+├── cell-renderers/
+│   └── drag-handle-cell-renderer/
+└── services/
+    └── lender.service.ts
+```
+
+### Dependencies
+- ag-grid-angular: ^24.0.0
+- ag-grid-community: ^24.0.0
+- GridAdapterService (existing)
+
+### API Endpoints Required
+- `GET /api/lenders` - Get all lenders
+- `PUT /api/lenders/tie-breaker-order` - Save tie-breaker order
+
+---
+
+---
+
+## Business Context
+
+### Feature Overview
+When requesting unsolicited bids for a security, if multiple lenders offer the same final fee, the system needs a way to prioritize which lender gets the bid. The tie-breaker ordering allows administrators to set a preference order for lenders.
+
+### Business Flow
+1. **User Action**: Administrator clicks "Set tie-breaker ordering" button on Lender Management screen
+2. **Dialog Opens**: Shows all lenders with current tie-breaker order (1, 2, 3...)
+3. **User Reorders**: Drags and drops lenders to set preferred order
+4. **Save**: Tie-breaker order is persisted to database
+5. **Usage**: When unsolicited bids are requested and fees match, system uses tie-breaker order to prioritize lenders
+
+### Feature Requirements
+- ✅ Button on Lender Management screen to open dialog
+- ✅ Dialog showing all lenders with tie-breaker numbers (1, 2, 3...)
+- ✅ Drag-and-drop functionality to reorder lenders
+- ✅ Save button to persist tie-breaker order to database
+- ✅ Cancel button to close without saving
+- ✅ Display current tie-breaker order
+- ✅ Handle pagination/scroll (shows "X of Y" lenders)
 
 ---
 
@@ -17,22 +99,62 @@ This document provides the Atomic Design breakdown for the **Tie-Breaker Orderin
 ### Component Hierarchy
 
 ```
-TieBreakerButtonMolecule (MOLECULE)
-  └── ButtonAtom (ATOM) - "Set Tie-Breaker" button
+LenderManagementPage (PAGE)
+  └── ButtonAtom (ATOM) - "Set tie-breaker ordering" button
+      └── Opens TieBreakerDialogOrganism
+      
+      OR (if reusable needed):
+      
+  └── TieBreakerButtonAtom (ATOM) - Wrapper for consistency
+      └── ButtonAtom (ATOM) - "Set tie-breaker ordering" button
+          └── Opens TieBreakerDialogOrganism
 
 TieBreakerDialogOrganism (ORGANISM)
   ├── DialogHeaderMolecule (MOLECULE)
-  │   ├── LabelAtom (ATOM) - Title
-  │   └── IconButtonAtom (ATOM) - Close button
-  ├── InstructionTextAtom (ATOM) - "Drag and drop rows..."
+  │   ├── LabelAtom (ATOM) - "Lender tie-breaker ordering"
+  │   └── IconButtonAtom (ATOM) - Close (X) button
+  ├── InstructionTextAtom (ATOM)
+  │   └── "Drag and drop rows to set the preferred lender when the final fees are equal."
   ├── ag-Grid (Third-party, wrapped via GridAdapterService)
-  │   └── Row with columns:
-  │       ├── DragHandleAtom (ATOM) - Row drag handle
-  │       ├── LabelAtom (ATOM) - Lender name
-  │       └── NumberDisplayAtom (ATOM) - Tie-breaker number
+  │   └── Columns:
+  │       ├── Drag Handle Column
+  │       │   └── DragHandleCellRenderer (uses DragHandleAtom)
+  │       ├── Name Column
+  │       │   └── Lender name (LabelAtom)
+  │       └── Tie Breaker Column
+  │           └── Tie-breaker number (NumberDisplayAtom) - 1, 2, 3...
   └── DialogActionsMolecule (MOLECULE)
-      ├── ButtonAtom (ATOM) - Cancel
-      └── ButtonAtom (ATOM) - Save
+      ├── ButtonAtom (ATOM) - "Cancel"
+      └── ButtonAtom (ATOM) - "Save"
+```
+
+### Visual Structure
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  Lender Management Screen                                │
+│  ┌───────────────────────────────────────────────────┐  │
+│  │  [Set tie-breaker ordering] ← Button (Molecule)   │  │
+│  └───────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────┘
+                    │
+                    │ Click
+                    ▼
+┌─────────────────────────────────────────────────────────┐
+│  Tie-Breaker Dialog (Organism)                          │
+│  ┌───────────────────────────────────────────────────┐  │
+│  │  Lender tie-breaker ordering        [X]          │  │ ← Header (Molecule)
+│  │  Drag and drop rows to set...                    │  │ ← Instruction (Atom)
+│  │  ┌─────────────────────────────────────────────┐  │  │
+│  │  │  [≡] BlackRock Advisors (UK) Limited    1  │  │  │
+│  │  │  [≡] BNY Mellon                          2  │  │  │
+│  │  │  [≡] JPMORGAN CHASE                      3  │  │  │ ← ag-Grid Rows
+│  │  │  [≡] Citibank N.A.                       4  │  │  │
+│  │  │  ... (scrollable, shows X of Y)          │  │  │
+│  │  └─────────────────────────────────────────────┘  │  │
+│  │                    [Cancel]  [Save]                │  │ ← Actions (Molecule)
+│  └───────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -212,56 +334,47 @@ export class NumberDisplayAtomComponent {
 
 ## Molecules
 
-### 1. TieBreakerButtonMolecule
-**Purpose**: Button to open tie-breaker dialog
+### 1. Tie-Breaker Button - Use ButtonAtom Directly
 
-**Props**:
-- `disabled`: boolean
-- `loading`: boolean
+**Why NOT a Molecule:**
 
-**Events**:
-- `clicked`: EventEmitter<void>
+In Atomic Design:
+- **Molecule** = Combines 2-5 atoms (e.g., SearchForm = InputAtom + ButtonAtom)
+- **Atom** = Single, indivisible component (e.g., ButtonAtom)
 
-**Composition**:
-- ButtonAtom
+The Tie-Breaker button is just a **ButtonAtom** with specific props:
+- Text: "Set tie-breaker ordering"
+- Icon: settings/gear
+- Type: secondary
+- Size: small
 
-**Usage**:
+**Since it's only ONE atom (ButtonAtom), it should NOT be a Molecule.**
+
+**Decision**: Use ButtonAtom directly - no need for a wrapper component.
+
+**Recommended Approach**: Use ButtonAtom directly
+
 ```html
-<app-tie-breaker-button-molecule
+<!-- In Lender Management Component -->
+<app-button
+  type="secondary"
+  size="small"
+  text="Set tie-breaker ordering"
+  icon="settings"
   (clicked)="openTieBreakerDialog()">
-</app-tie-breaker-button-molecule>
+</app-button>
 ```
 
-**Location**: `features/lender-management/molecules/tie-breaker-button/`
+**Why this is better:**
+- ✅ Simpler - no extra component
+- ✅ Follows Atomic Design - ButtonAtom is already an atom
+- ✅ More flexible - easy to change props
+- ✅ Less code to maintain
 
-**Implementation (Placeholder)**:
-```typescript
-@Component({
-  selector: 'app-tie-breaker-button-molecule',
-  template: `
-    <app-button
-      type="secondary"
-      size="small"
-      text="Set Tie-Breaker"
-      icon="settings"
-      [disabled]="disabled"
-      [loading]="loading"
-      (clicked)="onClick()">
-    </app-button>
-  `,
-  changeDetection: ChangeDetectionStrategy.OnPush
-})
-export class TieBreakerButtonMoleculeComponent {
-  @Input() disabled: boolean = false;
-  @Input() loading: boolean = false;
-  
-  @Output() clicked = new EventEmitter<void>();
-  
-  onClick() {
-    this.clicked.emit();
-  }
-}
-```
+**Only create TieBreakerButtonAtom if:**
+- You need this exact button in 3+ places
+- You need to add business logic (e.g., permission checks)
+- You need to combine with other atoms (then it becomes a Molecule)
 
 ---
 
@@ -651,9 +764,76 @@ export class TieBreakerDialogOrganismComponent implements OnInit {
 
 ---
 
+## Business Logic Flow
+
+### Complete User Journey
+
+```
+1. User on Lender Management Screen
+   ↓
+2. Clicks "Set tie-breaker ordering" button
+   ↓
+3. Dialog opens with all lenders
+   - Shows current tie-breaker order (1, 2, 3...)
+   - If no order exists, assigns default 1, 2, 3...
+   ↓
+4. User drags and drops lenders to reorder
+   - ag-Grid handles drag-drop
+   - Tie-breaker numbers update automatically (1, 2, 3...)
+   ↓
+5. User clicks "Save"
+   - Validates order
+   - Calls API to persist tie-breaker order
+   - Shows success message
+   - Closes dialog
+   ↓
+6. When unsolicited bids requested:
+   - System checks for fee matches
+   - If fees match, uses tie-breaker order to prioritize
+   - Lender with lower tie-breaker number gets priority
+```
+
+### Integration with Unsolicited Bids
+
+```typescript
+// In AvailabilityService or BidService
+getUnsolicitedBids(security: Security): Observable<Bid[]> {
+  return this.http.get<Bid[]>(`/api/bids/unsolicited/${security.id}`)
+    .pipe(
+      map(bids => {
+        // Group bids by final fee
+        const bidsByFee = this.groupByFee(bids);
+        
+        // For each fee group, if multiple lenders have same fee
+        return bidsByFee.map(feeGroup => {
+          if (feeGroup.bids.length > 1) {
+            // Use tie-breaker order to prioritize
+            return this.applyTieBreakerOrder(feeGroup.bids);
+          }
+          return feeGroup.bids;
+        }).flat();
+      })
+    );
+}
+
+private applyTieBreakerOrder(bids: Bid[]): Bid[] {
+  // Get tie-breaker order from LenderService
+  const tieBreakerOrder = this.lenderService.getTieBreakerOrder();
+  
+  // Sort bids by tie-breaker order (lower number = higher priority)
+  return bids.sort((a, b) => {
+    const orderA = tieBreakerOrder.find(l => l.id === a.lenderId)?.tieBreakerOrder || 999;
+    const orderB = tieBreakerOrder.find(l => l.id === b.lenderId)?.tieBreakerOrder || 999;
+    return orderA - orderB;
+  });
+}
+```
+
+---
+
 ## Usage in Parent Component
 
-### Example: Using in Lender Management Screen
+### Example: Integration in Lender Management Screen
 
 ```typescript
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
@@ -668,10 +848,23 @@ interface Lender {
 @Component({
   selector: 'app-lender-management',
   template: `
-    <!-- Button to open dialog -->
-    <app-tie-breaker-button-molecule
+    <!-- Lender Management Content -->
+    <div class="lender-management-content">
+      <!-- Other lender management UI -->
+      
+    <!-- Button to open tie-breaker dialog -->
+    <!-- Option 1: Use ButtonAtom directly (Recommended) -->
+    <app-button
+      type="secondary"
+      size="small"
+      text="Set tie-breaker ordering"
+      icon="settings"
       (clicked)="openTieBreakerDialog()">
-    </app-tie-breaker-button-molecule>
+    </app-button>
+    
+    <!-- Option 2: Use TieBreakerButtonAtom if created for reusability -->
+    <!-- <app-tie-breaker-button-atom (clicked)="openTieBreakerDialog()"></app-tie-breaker-button-atom> -->
+    </div>
     
     <!-- Tie-Breaker Dialog -->
     <app-tie-breaker-dialog-organism
@@ -709,17 +902,20 @@ export class LenderManagementComponent implements OnInit {
   onSaveTieBreaker(orderedLenders: Lender[]) {
     this.isSaving = true;
     
-    // Persist tie-breaker order
+    // Persist tie-breaker order to database
     this.lenderService.updateTieBreakerOrder(orderedLenders).subscribe({
       next: () => {
         this.isSaving = false;
         this.showTieBreakerDialog = false;
         // Refresh lenders to show updated order
         this.loadLenders();
+        // Show success notification
+        this.showSuccessMessage('Tie-breaker order saved successfully');
       },
       error: (error) => {
         this.isSaving = false;
         console.error('Error saving tie-breaker order:', error);
+        this.showErrorMessage('Failed to save tie-breaker order');
       }
     });
   }
@@ -731,56 +927,148 @@ export class LenderManagementComponent implements OnInit {
   onCloseTieBreaker() {
     this.showTieBreakerDialog = false;
   }
+  
+  private showSuccessMessage(message: string) {
+    // Show success notification
+  }
+  
+  private showErrorMessage(message: string) {
+    // Show error notification
+  }
 }
 ```
 
 ---
 
-## Service
+## Services
 
 ### LenderService
 **Location**: `features/lender-management/services/lender.service.ts`
+
+**Purpose**: Manages lender data and tie-breaker order operations
 
 **Methods**:
 ```typescript
 @Injectable({ providedIn: 'root' })
 export class LenderService {
+  private tieBreakerOrderCache: Lender[] = [];
+  
   constructor(private http: HttpClient) {}
   
   /**
    * Get all lenders
+   * Used to populate the dialog with lender list
    */
   getLenders(): Observable<Lender[]> {
-    return this.http.get<Lender[]>('/api/lenders');
+    return this.http.get<Lender[]>('/api/lenders').pipe(
+      tap(lenders => {
+        // Cache lenders for quick access
+        this.tieBreakerOrderCache = lenders;
+      })
+    );
   }
   
   /**
    * Update tie-breaker order for lenders
+   * Persists the order to database
+   * 
+   * @param lenders - Array of lenders with updated tieBreakerOrder
+   * @returns Observable<void>
    */
   updateTieBreakerOrder(lenders: Lender[]): Observable<void> {
+    // Only send id and tieBreakerOrder to minimize payload
     const payload = lenders.map(lender => ({
       id: lender.id,
       tieBreakerOrder: lender.tieBreakerOrder
     }));
     
-    return this.http.put<void>('/api/lenders/tie-breaker-order', payload);
+    return this.http.put<void>('/api/lenders/tie-breaker-order', payload).pipe(
+      tap(() => {
+        // Update cache after successful save
+        this.tieBreakerOrderCache = lenders;
+      })
+    );
+  }
+  
+  /**
+   * Get current tie-breaker order
+   * Used when processing unsolicited bids
+   * 
+   * @returns Array of lenders sorted by tie-breaker order
+   */
+  getTieBreakerOrder(): Lender[] {
+    return [...this.tieBreakerOrderCache]
+      .sort((a, b) => (a.tieBreakerOrder || 999) - (b.tieBreakerOrder || 999));
+  }
+  
+  /**
+   * Get lender by ID with tie-breaker order
+   * Used to determine priority when fees match
+   */
+  getLenderTieBreakerOrder(lenderId: string): number {
+    const lender = this.tieBreakerOrderCache.find(l => l.id === lenderId);
+    return lender?.tieBreakerOrder || 999; // Default to low priority if not found
   }
 }
 ```
 
+### API Endpoints
+
+**Get All Lenders**:
+```
+GET /api/lenders
+Response: Lender[]
+```
+
+**Update Tie-Breaker Order**:
+```
+PUT /api/lenders/tie-breaker-order
+Request Body: { id: string, tieBreakerOrder: number }[]
+Response: void
+```
+
 ---
 
-## Data Model
+## Data Models
 
 ### Lender Interface
 ```typescript
+/**
+ * Lender entity with tie-breaker ordering support
+ */
 export interface Lender {
   id: string;
   name: string;
-  tieBreakerOrder: number; // 1, 2, 3, ...
-  // ... other lender properties
+  tieBreakerOrder: number; // 1, 2, 3, ... (lower number = higher priority)
+  // ... other lender properties (balance, collateral types, etc.)
+}
+
+/**
+ * Payload for updating tie-breaker order
+ * Only sends minimal data needed for persistence
+ */
+export interface TieBreakerOrderUpdate {
+  id: string;
+  tieBreakerOrder: number;
 }
 ```
+
+### Business Rules
+
+1. **Tie-Breaker Order**:
+   - Lower number = Higher priority
+   - Example: Lender with tie-breaker 1 gets priority over lender with tie-breaker 2
+   - Default order: 1, 2, 3... if not set
+
+2. **When Fees Match**:
+   - System checks tie-breaker order
+   - Lender with lower tie-breaker number wins
+   - If tie-breaker order not set, uses default order
+
+3. **Persistence**:
+   - Only tie-breaker order is saved, not entire lender object
+   - Order is persisted immediately on Save
+   - Cancel discards changes and resets to original order
 
 ---
 
@@ -791,6 +1079,8 @@ export interface Lender {
   - [ ] Props: type, size, disabled, loading, icon, text
   - [ ] Event: clicked
   - [ ] Location: `shared/atoms/button/`
+  - [ ] **Note**: Use this directly for "Set tie-breaker ordering" button
+  - [ ] **OR** Create TieBreakerButtonAtom if needed for reusability
   
 - [ ] **DragHandleAtom** - Drag handle icon
   - [ ] Props: disabled
@@ -815,12 +1105,6 @@ export interface Lender {
 ---
 
 ### Phase 2: Molecules (Simple Combinations)
-- [ ] **TieBreakerButtonMolecule** - Button to open dialog
-  - [ ] Uses: ButtonAtom
-  - [ ] Props: disabled, loading
-  - [ ] Event: clicked
-  - [ ] Location: `features/lender-management/molecules/tie-breaker-button/`
-  
 - [ ] **DialogHeaderMolecule** - Dialog header
   - [ ] Uses: LabelAtom, IconButtonAtom
   - [ ] Props: title
@@ -873,7 +1157,7 @@ export interface Lender {
 
 ### Phase 6: Integration
 - [ ] **Parent Component Integration**
-  - [ ] Add TieBreakerButtonMolecule to parent component
+  - [ ] Add ButtonAtom (or TieBreakerButtonAtom) to parent component
   - [ ] Add TieBreakerDialogOrganism to parent component
   - [ ] Implement open/close dialog logic
   - [ ] Implement save handler (calls LenderService)
@@ -967,15 +1251,65 @@ All components follow migration-friendly patterns:
 
 ---
 
-## Key Implementation Points
+## Technical Specifications
 
-1. **Default Tie-Breaker Order**: If lenders don't have a tie-breaker order, assign 1, 2, 3... based on current order
-2. **ag-Grid Row Dragging**: Use ag-Grid's built-in `rowDragManaged: true` for drag-and-drop
-3. **Update Order**: After row drag, update `tieBreakerOrder` to match new position (1, 2, 3...)
-4. **Grid Adapter**: Use GridAdapterService for migration-friendly ag-Grid operations
-5. **Persistence**: Save only the tie-breaker order, not entire lender objects
-6. **Cancel Behavior**: Reset to original order when canceling
-7. **Cell Renderer**: Use custom cell renderer for drag handle column
+### ag-Grid Configuration
+
+**Row Dragging Setup**:
+```typescript
+gridOptions = {
+  rowDragManaged: true,      // Enable row dragging
+  animateRows: true,         // Smooth animation
+  suppressRowClickSelection: true,
+  onRowDragEnd: (event) => this.onRowDragEnd(event)
+};
+```
+
+**Column Definitions**:
+- **Drag Handle Column**: 50px width, pinned left, custom cell renderer
+- **Name Column**: Flex 1, shows lender name
+- **Tie Breaker Column**: 120px width, shows order number (1, 2, 3...)
+
+### Key Implementation Points
+
+1. **Default Tie-Breaker Order**: 
+   - If lenders don't have a tie-breaker order, assign 1, 2, 3... based on current order
+   - Sort by existing `tieBreakerOrder` if present, otherwise use array index
+
+2. **ag-Grid Row Dragging**: 
+   - Use ag-Grid's built-in `rowDragManaged: true` for drag-and-drop
+   - Handle `onRowDragEnd` event to update order
+
+3. **Update Order**: 
+   - After row drag, update `tieBreakerOrder` to match new position (1, 2, 3...)
+   - Refresh grid cells to show updated numbers
+
+4. **Grid Adapter**: 
+   - Use GridAdapterService for migration-friendly ag-Grid operations
+   - Abstract version-specific APIs
+
+5. **Persistence**: 
+   - Save only the tie-breaker order (id + tieBreakerOrder), not entire lender objects
+   - Minimize payload size
+
+6. **Cancel Behavior**: 
+   - Reset to original order when canceling
+   - Don't persist changes
+
+7. **Cell Renderer**: 
+   - Use custom cell renderer for drag handle column
+   - Implements `ICellRendererAngularComp`
+
+8. **Pagination/Scroll**:
+   - ag-Grid handles scrolling automatically
+   - Show "X of Y" indicator if needed (can use ag-Grid's status bar)
+
+### Error Handling
+
+- **API Errors**: Show error message, keep dialog open
+- **Validation**: Ensure all lenders have tie-breaker order before save
+- **Loading States**: Disable buttons during save operation
+- **Network Issues**: Retry logic or show appropriate error
 
 ---
 

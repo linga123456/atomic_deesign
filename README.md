@@ -62,7 +62,30 @@ This repository contains comprehensive guidelines and examples for developing An
 - Feature compatibility matrix
 - Migration-friendly features to use now
 
-### 7. [examples/](./examples/)
+### 7. [MODULE_FEDERATION_SETUP_GUIDE.md](./MODULE_FEDERATION_SETUP_GUIDE.md)
+**Complete guide for loading Angular Latest app as module in Angular 11**:
+- Step-by-step Module Federation setup
+- Node.js version management (Node 12 for Angular 11, Node 18+ for Angular Latest)
+- Pre-built bundle approach (for Node 12 constraint)
+- Apache deployment configuration
+- Alternative approaches and troubleshooting
+
+### 8. [MODULE_FEDERATION_QUICK_START.md](./MODULE_FEDERATION_QUICK_START.md)
+**Quick reference for Module Federation setup**:
+- 15-minute quick setup guide
+- Essential commands with Node version switching
+- Apache deployment quick steps
+- Common issues and solutions
+
+### 9. [NODE_VERSION_MANAGEMENT_GUIDE.md](./NODE_VERSION_MANAGEMENT_GUIDE.md)
+**Guide for managing multiple Node.js versions**:
+- NVM installation (Windows/Mac/Linux)
+- Switching between Node 12 and Node 18+
+- Development workflow
+- CI/CD setup
+- Best practices
+
+### 10. [examples/](./examples/)
 **Working code examples**:
 - `streaming-service.example.ts` - r-Socket abstraction service
 - `grid-adapter-service.example.ts` - ag-Grid abstraction service
@@ -101,6 +124,12 @@ This repository contains comprehensive guidelines and examples for developing An
 2. **Visual Guide**: Review `ATOMIC_DESIGN_VISUAL_GUIDE.md` for diagrams and component trees
 3. **Examples**: Review `examples/atomic-design-examples/` for complete code implementations
 4. **Migration Patterns**: All patterns integrated in the complete guide
+
+### For Module Federation (Loading Angular Latest in Angular 11):
+1. **Quick Start**: Start with `MODULE_FEDERATION_QUICK_START.md` for fast setup
+2. **Complete Guide**: Read `MODULE_FEDERATION_SETUP_GUIDE.md` for detailed instructions
+3. **Node Version Management**: Follow `NODE_VERSION_MANAGEMENT_GUIDE.md` for managing Node 12 vs Node 18+
+4. **Important**: Your Angular 11 app requires Node.js 12 - use NVM to switch versions
 
 ## 📋 Current Stack
 
